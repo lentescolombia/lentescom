@@ -50,7 +50,7 @@ router.post('/api/comprar',(req, res, next) => {
             lang: 'es',
             external: 'false',
             extra1: data.products.join(','),
-            response: 'http://lentes-colombia.com/api/response',
+            response: 'https://lentes-colombia.com/api/response',
             methodsDisable: ["CASH", 'PSE', 'SP', 'DP'],
             address_billing: userInfo.address_billing,
             type_doc_billing: userInfo.type_doc_billing,
