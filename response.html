@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.0/yeti/bootstrap.min.css" rel="stylesheet" integrity="sha384-chJtTd1EMa6hQI40eyJWF6829eEk4oIe7b3nNtUni7VxA3uHc/uIM/8ppyjrggfV" crossorigin="anonymous">
+    <title>Document</title>
+    <style>
+        .container{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .bold{
+            font-weight: bold;
+        }
+
+        .buttons{
+            display: flex;
+        }
+
+        @media print {
+            body{
+                visibility: hidden;
+                -webkit-print-color-adjust: exact !important;
+            }
+
+            #printBtn {
+                visibility: hidden !important;
+            }
+
+            #toprint{
+                visibility: visible !important;
+                text-align: left;
+                -webkit-print-color-adjust: exact !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class='table-responsive' id='toprint'>
+            <div id="d-mensaje-respuesta" class="alert"></div>
+            <table class="table table-bordered">
+                <thead class="thead-light">
+                    <tr>
+                        <th class="bold"><h1>FACTURA DE COMPRA</h1></th>
+                        <th class="bold"><img src='http://www.lentes-colombia.com/logo' width='150vh' height='80vh'/></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="bold">Referencia</td>
+                        <td id='referencia'></td>
+                    </tr>
+                    <tr>
+                        <td class="bold">Fecha</td>
+                        <td id="fecha"></td>
+                    </tr>
+                    <tr>
+                        <td class="bold">Respuesta</td>
+                        <td id="respuesta"></td>
+                    </tr>
+                    <tr>
+                        <td class="bold">Motivo</td>
+                        <td id="motivo"></td>
+                    </tr>
+                    <tr>
+                        <td class="bold">Banco</td>
+                        <td id="banco"></td>
+                    </tr>
+                    <tr>
+                        <td class="bold">Recibo</td>
+                        <td id="recibo"></td>
+                    </tr>
+                    <tr>
+                        <td class="bold">Direccion de entrega</td>
+                        <td id="direccion"></td>
+                    </tr>
+                    <tr>
+                        <td class="bold">Nombre del comprador</td>
+                        <td id="nombre"></td>
+                    </tr>
+                    <tr>
+                        <td class="bold">Documento del comprador</td>
+                        <td id="documento"></td>
+                    </tr>
+                    <tr>
+                        <td class="bold">Descripcion</td>
+                        <td id="descripcion"></td>
+                    </tr>
+                    <tr>
+                        <td class="bold">Total</td>
+                        <td id="total"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <br/>
+        <div class="alert alert-info">
+            Recuerde imprimir o guardar esta factura, servira en caso de querer realizar una queja o un reclamo
+        </div>
+        <div class="buttons">
+            <button class="btn btn-primary" id='printBtn'>Imprimir</button>
+            &nbsp;
+            &nbsp;
+            <button class="btn btn-success" onclick="window.location.href='http://www.lentes-colombia.com/'">Regresar</button>
+        </div>
+    </div>
+    <script>
+        document.querySelector('#printBtn').addEventListener('click', () => {
+            window.print();
+        })
+        let params = new URLSearchParams(document.location.search);
+        if (params.has('ref_payco')){
+            let data = {
+                ref_payco: params.get('ref_payco')
+            }
+            fetch('http://www.lentes-colombia.com/api/confirmation', {
+                method: 'post',
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(json => {
+                let mensaje = "";
+                let tipoAlerta = "";
+                if(json.data.x_cod_response == 1){
+                    mensaje = "Transaccion Aprobada";
+                    tipoAlerta = 'alert-success';
+                    document.querySelector('#total').textContent = json.data.x_amount + " " + json.data.x_currency_code;
+                } else if(json.data.x_cod_response == 2){
+                    mensaje = "Transaccion Rechazda";
+                    tipoAlerta = 'alert-danger';
+                } else if(json.data.x_cod_response == 3){
+                    mensaje = "Transaccion Pendiente";
+                    tipoAlerta = 'alert-info';
+                } else if(json.data.x_cod_response == 4){
+                    mensaje = "Transaccion Fallida";
+                    tipoAlerta = 'alert-danger';
+                }
+                document.querySelector('#d-mensaje-respuesta').classList.toggle(tipoAlerta);
+                document.querySelector('#d-mensaje-respuesta').textContent = mensaje;
+                console.log(json)
+                document.querySelector('#referencia').textContent = json.data.x_id_invoice;
+                document.querySelector('#fecha').textContent = json.data.x_transaction_date;
+                document.querySelector('#respuesta').textContent = json.data.x_response;
+                document.querySelector('#motivo').textContent = json.data.x_response_reason_text;
+                document.querySelector('#banco').textContent = json.data.x_bank_name;
+                document.querySelector('#recibo').textContent = json.data.x_transaction_id;
+                document.querySelector('#direccion').textContent = json.pedido.direccion_comprador;
+                document.querySelector('#nombre').textContent = json.pedido.nombre_comprador;
+                document.querySelector('#documento').textContent = json.pedido.documento_comprador;
+                document.querySelector('#descripcion').textContent = json.pedido.description;
+            });
+        }
+    </script>
+</body>
+</html>
