@@ -47,7 +47,7 @@
                 <thead class="thead-light">
                     <tr>
                         <th class="bold"><h1>FACTURA DE COMPRA</h1></th>
-                        <th class="bold"><img src='http://www.lentes-colombia.com/logo' width='150vh' height='80vh'/></th>
+                        <th class="bold"><img src='https://www.lentes-colombia.com/logo' width='150vh' height='80vh'/></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -106,7 +106,7 @@
             <button class="btn btn-primary" id='printBtn'>Imprimir</button>
             &nbsp;
             &nbsp;
-            <button class="btn btn-success" onclick="window.location.href='http://www.lentes-colombia.com/'">Regresar</button>
+            <button class="btn btn-success" onclick="window.location.href='https://www.lentes-colombia.com/'">Regresar</button>
         </div>
     </div>
     <script>
@@ -118,7 +118,7 @@
             let data = {
                 ref_payco: params.get('ref_payco')
             }
-            fetch('http://www.lentes-colombia.com/api/confirmation', {
+            fetch('https://www.lentes-colombia.com/api/confirmation', {
                 method: 'post',
                 body: JSON.stringify(data)
             })
